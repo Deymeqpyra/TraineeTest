@@ -1,0 +1,121 @@
+@model IEnumerable<Domain.User>
+
+@{
+ViewData["Title"] = "Contact Manager Application";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="mt-3">
+    <form method="post" action="@Url.Action("LoadFile", "User")">
+        <div class="form-group">
+            <label for="filePath">Select CSV File</label>
+            <input type="file" id="filePath" name="filePath" class="form-control" accept=".csv" />
+        </div>
+        <br/>
+        <button type="submit" class="btn btn-primary">Upload CSV</button>
+    </form>
+    <br/>
+    <input type="text" id="searchInput" placeholder="Filter users..." class="form-control mb-3" />
+    <table class="table table-bordered" id="userTable">
+        <thead>
+        <tr>
+            <th onclick="sortTable(0)">Name</th>
+            <th onclick="sortTable(1)">Date of birth</th>
+            <th onclick="sortTable(2)">Married</th>
+            <th onclick="sortTable(3)">Phone</th>
+            <th onclick="sortTable(4)">Salary</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in Model)
+        {
+        <tr id="row_@user.Id">
+            <form method="post" action="@Url.Action("EditUser", "User")">
+                <input type="hidden" name="userId" value="@user.Id" />
+                <td>
+                    <span id="name_display_@user.Id">@user.Name</span>
+                    <input type="text" class="form-control" value="@user.Name" name="Name" id="name_edit_@user.Id" style="display:none" />
+                </td>
+                <td>
+                    <span id="dob_display_@user.Id">@user.DateOfBirth.ToString("yyyy-MM-dd")</span>
+                    <input type="date" class="form-control" value="@user.DateOfBirth.ToString("yyyy-MM-dd")" name="DateOfBirth" id="dob_edit_@user.Id" style="display:none" />
+                </td>
+                <td>
+                    <span id="married_display_@user.Id">@(user.Married ? "Yes" : "No")</span>
+                    <input type="checkbox" name="Married" value="true" checked style="display:none" />
+                </td>
+                <td>
+                    <span id="phone_display_@user.Id">@user.Phone</span>
+                    <input type="text" class="form-control" value="@user.Phone" name="Phone" id="phone_edit_@user.Id" style="display:none" />
+                </td>
+                <td>
+                    <span id="salary_display_@user.Id">@user.Salary</span>
+                    <input type="number" class="form-control" value="@user.Salary" name="Salary" id="salary_edit_@user.Id" style="display:none" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="editRow(@user.Id)">Edit</button>
+                    <button type="submit" class="btn btn-success btn-sm" id="save_@user.Id" style="display:none">Save</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="cancel_@user.Id" onclick="cancelEdit(@user.Id)" style="display:none">Cancel</button>
+                    <form method="post" action="@Url.Action("DeleteUser", "User")" style="display:inline;">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </form>
+            
+        </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#userTable tbody tr");
+
+        rows.forEach(row => {
+            let cells = row.getElementsByTagName("td");
+            let match = Array.from(cells).some(cell => cell.innerText.toLowerCase().includes(filter));
+            row.style.display = match ? "" : "none";
+        });
+    });
+
+    function sortTable(columnIndex) {
+        let table = document.getElementById("userTable");
+        let rows = Array.from(table.rows).slice(1);
+        let isAsc = table.getAttribute("data-sort-order") !== "asc";
+        table.setAttribute("data-sort-order", isAsc ? "asc" : "desc");
+
+        rows.sort((a, b) => {
+            let cellA = a.cells[columnIndex].innerText.toLowerCase();
+            let cellB = b.cells[columnIndex].innerText.toLowerCase();
+
+            if (columnIndex === 4) {
+                return isAsc ? parseFloat(cellA) - parseFloat(cellB) : parseFloat(cellB) - parseFloat(cellA);
+            } else {
+                return isAsc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+            }
+        });
+
+        rows.forEach(row => table.appendChild(row));
+    }
+
+    function editRow(userId) {
+        document.querySelector(`#row_${userId}`).querySelectorAll("span").forEach(span => span.style.display = "none");
+        document.querySelector(`#row_${userId}`).querySelectorAll("input").forEach(input => input.style.display = "block");
+        document.getElementById(`save_${userId}`).style.display = "inline-block";
+        document.getElementById(`cancel_${userId}`).style.display = "inline-block";
+    }
+
+    function cancelEdit(userId) {
+        document.querySelector(`#row_${userId}`).querySelectorAll("span").forEach(span => span.style.display = "block");
+        document.querySelector(`#row_${userId}`).querySelectorAll("input").forEach(input => input.style.display = "none");
+        document.getElementById(`save_${userId}`).style.display = "none";
+        document.getElementById(`cancel_${userId}`).style.display = "none";
+    }
+</script>
+}
