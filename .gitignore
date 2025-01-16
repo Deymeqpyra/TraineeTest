@@ -6,5 +6,8 @@
 /ContactManagerApplication/Infrastructure/obj
 /ContactManagerApplication/Infrastructure/bin
 
+/ContactManagerApplication/Application/bin
+/ContactManagerApplication/Application/obj
+
 /ContactManagerApplication/Presentation/bin
 /ContactManagerApplication/Presentation/obj
