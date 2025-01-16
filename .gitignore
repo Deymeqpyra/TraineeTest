@@ -1,0 +1,10 @@
+/ContactManagerApplication/.idea
+
+/ContactManagerApplication/Domain/bin
+/ContactManagerApplication/Domain/obj
+
+/ContactManagerApplication/Infrastructure/obj
+/ContactManagerApplication/Infrastructure/bin
+
+/ContactManagerApplication/Presentation/bin
+/ContactManagerApplication/Presentation/obj
